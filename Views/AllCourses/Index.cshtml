@@ -1,0 +1,210 @@
+﻿@model LearningMVCApp.Models.AllCoursesViewModel
+
+@{
+    ViewData["Title"] = "All Courses";
+}
+
+<div class="container mt-4">
+
+    <!-- Page Header -->
+    <div class="text-center mb-4">
+
+        <h2 class="fw-bold">All Courses</h2>
+
+        <p class="text-muted">
+            Explore our available courses
+        </p>
+
+        <a asp-controller="Cart"
+           asp-action="Index"
+           class="btn btn-outline-primary">
+            Go to Cart
+        </a>
+
+    </div>
+
+
+    <!-- Course Filters -->
+    <div class="text-center mb-4">
+
+        <label class="me-3">
+
+            <input type="checkbox"
+                   id="masterCheck"
+                   onchange="filterCourses()" />
+
+            Master Courses
+
+        </label>
+
+
+        <label>
+
+            <input type="checkbox"
+                   id="subCheck"
+                   onchange="filterCourses()" />
+
+            Sub Courses
+
+        </label>
+
+    </div>
+
+
+    <!-- Master Courses -->
+    @foreach (var course in Model.MasterCourses)
+    {
+        <div class="master-course-section mb-5">
+
+            <!-- Master Course -->
+            <div class="masterCourses">
+
+                <div class="row">
+
+                    <div class="col-md-6 col-lg-4 mb-4">
+
+                        <div class="card h-100 shadow-sm">
+
+                            <img src="@course.Thumbnail"
+                                 class="card-img-top"
+                                 alt="@course.MasterCourseName"
+                                 style="height: 200px; object-fit: cover;" />
+
+                            <div class="card-body">
+
+                                <h5 class="fw-bold">
+                                    @course.MasterCourseName
+                                </h5>
+
+                                <p class="text-muted">
+                                    Status: @course.Status
+                                </p>
+
+                                <!-- Add To Cart -->
+                                <form asp-controller="Cart"
+                                      asp-action="AddToCart"
+                                      method="post">
+
+                                    <input type="hidden"
+                                           name="userId"
+                                           value="1" />
+
+                                    <input type="hidden"
+                                           name="masterCourseId"
+                                           value="@course.MasterCourseId" />
+
+                                    <button type="submit"
+                                            class="btn btn-primary">
+                                        Add to Cart
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Sub Courses -->
+            <div class="subCourses">
+
+                <h4 class="mb-3">
+                    Sub Courses
+                </h4>
+
+                <div class="row">
+
+                    @foreach (var subCourse in Model.SubCourses
+                        .Where(x => x.MasterCourseId == course.MasterCourseId))
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+
+                            <div class="card h-100 shadow-sm">
+
+                                <img src="@subCourse.Thumbnail"
+                                     class="card-img-top"
+                                     alt="@subCourse.SubCourseName"
+                                     style="height: 180px; object-fit: cover;" />
+
+                                <div class="card-body">
+
+                                    <h5 class="fw-bold">
+                                        @subCourse.SubCourseName
+                                    </h5>
+
+                                    <p class="text-muted">
+                                        Status: @subCourse.Status
+                                    </p>
+
+                                    <h5 class="mb-0">
+                                        ₹@subCourse.Amount
+                                    </h5>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+
+<script>
+
+    function filterCourses() {
+        var masterChecked =
+            document.getElementById("masterCheck").checked;
+
+        var subChecked =
+            document.getElementById("subCheck").checked;
+
+
+        var masterSections =
+            document.querySelectorAll(".masterCourses");
+
+        var subSections =
+            document.querySelectorAll(".subCourses");
+
+
+        // Show / Hide Master Courses
+        masterSections.forEach(function(section) {
+            if (masterChecked) {
+                section.style.display = "block";
+            }
+            else {
+                section.style.display = "none";
+            }
+        });
+
+
+        // Show / Hide Sub Courses
+        subSections.forEach(function(section) {
+            if (subChecked) {
+                section.style.display = "block";
+            }
+            else {
+                section.style.display = "none";
+            }
+        });
+
+    }
+
+
+    // Hide both when page first opens
+    filterCourses();
+
+</script>

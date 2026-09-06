@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Payment";
+}
+
+<div class="container mt-4">
+
+    <h2>Complete Payment</h2>
+
+    <p>
+        Amount:
+        <strong>₹@ViewBag.AmountInRupees</strong>
+    </p>
+
+    <button id="rzp-button"
+            class="btn btn-success">
+        Pay with Razorpay
+    </button>
+
+</div>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+
+    var options = {
+
+        key: "@ViewBag.KeyId",
+
+        amount: "@ViewBag.Amount",
+
+        currency: "INR",
+
+        name: "Masstech Business Solutions Pvt.Ltd",
+
+        description: "Course Subscription",
+
+        order_id: "@ViewBag.OrderId",
+
+        handler: function(response) {
+
+            fetch('/Cart/PaymentSuccess', {
+
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+
+                    razorpayPaymentId:
+                        response.razorpay_payment_id,
+
+                    razorpayOrderId:
+                        response.razorpay_order_id,
+
+                    razorpaySignature:
+                        response.razorpay_signature
+
+                })
+
+            })
+                .then(function() {
+
+                    window.location.href = '/Cart';
+
+                });
+
+        },
+
+        theme: {
+            color: "#F37254"
+        }
+
+    };
+
+
+    var rzp1 = new Razorpay(options);
+
+
+    document.getElementById("rzp-button").onclick =
+        function(e) {
+
+            rzp1.open();
+
+            e.preventDefault();
+
+        };
+
+</script>

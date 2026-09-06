@@ -1,0 +1,96 @@
+﻿@model LearningMVCApp.Models.CartViewModel
+
+@{
+    ViewData["Title"] = "My Cart";
+}
+
+<div class="container mt-4">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    <h2 class="mb-4">My Cart</h2>
+
+    <a asp-controller="AllCourses"
+       asp-action="Index"
+       class="btn btn-outline-primary mb-3">
+        Back to All Courses
+    </a>
+
+    @if (Model.CartItems.Count == 0)
+    {
+        <div class="alert alert-info">
+            Your cart is empty.
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model.CartItems)
+        {
+            var course = Model.MasterCourses
+                .FirstOrDefault(c => c.MasterCourseId == item.MasterCourseId);
+
+            <div class="card mb-3">
+
+                <div class="card-body">
+
+                    <h5>
+                        @course?.MasterCourseName
+                    </h5>
+
+                    <form asp-controller="Cart"
+                          asp-action="RemoveFromCart"
+                          method="post">
+
+                        <input type="hidden"
+                               name="cartItemId"
+                               value="@item.CartItemId" />
+
+                        <button type="submit"
+                                class="btn btn-danger">
+                            Remove
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+        }
+
+        <div class="card mt-4">
+
+            <div class="card-body">
+
+                <h4>
+                    Total Amount:
+                    ₹@Model.CartTotal
+                </h4>
+
+                <form asp-controller="Cart"
+                      asp-action="Buy"
+                      method="post">
+
+                    <button type="submit"
+                            class="btn btn-success">
+                        Buy
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    }
+
+</div>
