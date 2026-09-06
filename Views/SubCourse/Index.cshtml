@@ -1,0 +1,365 @@
+﻿@model IEnumerable<LearningPlatform.Models.SubCourse>
+
+
+@if(TempData["Msg"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Msg"]
+    </div>
+}
+
+<button type="button"
+        class="btn btn-primary mt-4 mb-4"
+        data-bs-toggle="modal"
+        data-bs-target="#addSubCourseModal">
+    Add
+</button>
+
+
+<div class="modal fade" id="addSubCourseModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addSubCourseModal">Sub Course</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Create"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <div class="mb-3">
+                        <label>Master Course</label>
+
+                        <select name="MasterCourseId"
+                                class="form-control"
+                                required>
+
+                            <option value="">Select Master Course</option>
+
+                            @foreach (var master in ViewBag.MasterCourses)
+                            {
+                                <option value="@master.MasterCourseId">
+                                    @master.MasterCourseName
+                                </option>
+                            }
+
+                        </select>
+                    </div>
+
+                    <br />
+
+                    <label>Sub Course Name</label>
+                    <input type="text"
+                           name="SubCourseName"
+                           class="form-control" />
+
+                    <br />
+
+                    <label>Thumbnail</label>
+                    <input type="file"
+                           name="ThumbnailFile"
+                           class="form-control" />
+
+                    <br />
+
+                    <label>Amount</label>
+                    <input type="number"
+                           name="Amount"
+                           class="form-control" />
+
+                    <br />
+
+                    <label>Status</label>
+                    <select name="Status"
+                            class="form-control">
+
+                        <option value="">Select Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+
+                    </select>
+
+                    <br />
+
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Save
+                    </button>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<h2 class="mt-5">Sub Course List</h2>
+
+<table id="SubCoursetable" class="table table-bordered table-striped">
+
+    <thead>
+        <tr>
+            <th>Sub Course ID</th>
+            <th>Master Course ID</th>
+            <th>Sub Course Name</th>
+            <th>Thumbnail</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Created By</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var subcourse in Model)
+        {
+            <tr>
+                <td>
+                    @subcourse.SubCourseId
+                </td>
+
+                <td>
+                    @subcourse.MasterCourseId
+                </td>
+
+                <td>
+                    @subcourse.SubCourseName
+                </td>
+
+                <td>
+                    <img  src="@subcourse.Thumbnail"
+                    width="80"
+                    height="60"
+                    style="object-fit: cover;"
+                    />
+                </td>
+
+                <td>
+                    @subcourse.Amount
+                </td>
+
+                <td>
+                    @if (subcourse.Status == "Active")
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inactive</span>
+                    }
+                </td>
+
+                <td>
+                    @subcourse.CreatedAt
+                </td>
+
+                <td>
+                    @subcourse.CreatedBy
+                </td>
+
+                <td>
+                    <button type="button"
+                            class="btn btn-primary btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#EditSubCourse"
+                            onclick="editSubCourse(
+                                    '@subcourse.SubCourseId',
+                                    '@subcourse.MasterCourseId',
+                                    '@subcourse.SubCourseName',
+                                    '@subcourse.Thumbnail',
+                                    '@subcourse.Amount',
+                                    '@subcourse.Status'
+            )">
+                        <i class="fas fa-edit"></i>
+                    </button>
+
+                    <a asp-action="Delete"
+                       asp-route-id="@subcourse.SubCourseId"
+                       class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+
+
+
+
+<div class="modal fade"
+     id="EditSubCourse"
+     tabindex="-1"
+     aria-labelledby="editSubCourseLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h1 class="modal-title fs-5"
+                    id="editSubCourseLabel">
+                    Edit Sub Course
+                </h1>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <form asp-action="Update"
+                      method="post"
+                      enctype="multipart/form-data">
+
+
+                    <input type="hidden"
+                           id="editSubCourseId"
+                           name="SubCourseId" />
+
+
+                    <label>Master Course</label>
+
+                    <select id="editMasterCourseId"
+                            name="MasterCourseId"
+                            class="form-control">
+
+                        <option value="">
+                            Select Master Course
+                        </option>
+
+                        @foreach (var master in ViewBag.MasterCourses)
+                        {
+                            <option value="@master.MasterCourseId">
+                                @master.MasterCourseName
+                            </option>
+                        }
+
+                    </select>
+
+                    <br />
+
+
+
+                    <label>Sub Course Name</label>
+
+                    <input type="text"
+                           id="editSubCourseName"
+                           name="SubCourseName"
+                           class="form-control" />
+
+                    <br />
+
+
+
+                    <label>Thumbnail</label>
+
+                    <input type="file"
+                           name="ThumbnailFile"
+                           class="form-control" />
+
+                    <br />
+
+
+
+                    <label>Amount</label>
+
+                    <input type="number"
+                           id="editAmount"
+                           name="Amount"
+                           class="form-control"
+                           step="0.01" />
+
+                    <br />
+
+
+
+                    <label>Status</label>
+
+                    <select id="editSubCourseStatus"
+                            name="Status"
+                            class="form-control">
+
+                        <option value="Active">
+                            Active
+                        </option>
+
+                        <option value="Inactive">
+                            Inactive
+                        </option>
+
+                    </select>
+
+                    <br />
+
+
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Update
+                    </button>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <script>
+
+                function editSubCourse(id, masterCourseId, name, thumbnail  ,amount, status)
+        {
+            document.getElementById("editSubCourseId").value = id;
+
+            document.getElementById("editMasterCourseId").value = masterCourseId;
+
+            document.getElementById("editSubCourseName").value = name;
+
+            document.getElementById("editAmount").value = amount;
+
+            document.getElementById("editSubCourseStatus").value = status;
+
+        }
+
+
+        $(document).ready(function () {
+
+            $('#SubCoursetable').DataTable();
+
+        });
+
+    </script>
+    }
